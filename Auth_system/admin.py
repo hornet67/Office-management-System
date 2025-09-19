@@ -68,10 +68,11 @@ class UserInfoAdmin(admin.ModelAdmin):
 # -------------------------
 @admin.register(PendingUser)
 class PendingUserAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'role', 'company', 'registered_at', 'activate_button')
+    list_display = ('name', 'email', 'role', 'company', 'registered_at', 'activate_button','delete_button')
     list_filter = ('role', 'company')
     search_fields = ('name', 'email', 'company__company_name')
 
+    # Activate button
     def activate_button(self, obj):
         return format_html(
             '<a class="button" href="{}">Activate</a>',
@@ -79,6 +80,16 @@ class PendingUserAdmin(admin.ModelAdmin):
         )
     activate_button.short_description = 'Activate User'
     activate_button.allow_tags = True
+   
+   
+    # Delete button
+    def delete_button(self, obj):
+        return format_html(
+            '<a class="button" href="{}">Delete</a>',
+            f'delete/{obj.id}/'
+        )
+    delete_button.short_description = 'Delete User'
+    delete_button.allow_tags = True
 
     # Custom admin URL
     def get_urls(self):
@@ -86,6 +97,7 @@ class PendingUserAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         custom_urls = [
             path('activate/<int:pending_user_id>/', self.admin_site.admin_view(self.activate_user), name='activate-user'),
+            path('delete/<int:pending_user_id>/', self.admin_site.admin_view(self.delete_user), name='delete-user'),
         ]
         return custom_urls + urls
 
@@ -95,5 +107,13 @@ class PendingUserAdmin(admin.ModelAdmin):
         user_info = activate_pending_user(pending_user_id, activating_user)
         self.message_user(request, f'User "{user_info.name}" has been activated successfully.')
         from django.shortcuts import redirect
+        return redirect('/admin/Auth_system/pendinguser/')
+    
+    # View to handle deletion
+    def delete_user(self, request, pending_user_id):
+        from django.shortcuts import redirect, get_object_or_404
+        pending_user = get_object_or_404(PendingUser, pk=pending_user_id)
+        pending_user.delete()
+        self.message_user(request, f'Pending user "{pending_user.name}" has been deleted.', level='warning')
         return redirect('/admin/Auth_system/pendinguser/')
     
