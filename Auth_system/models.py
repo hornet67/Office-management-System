@@ -136,6 +136,8 @@ class PendingUser(models.Model):
     image = models.ImageField(upload_to='user_images/', null=True, blank=True)
     company = models.ForeignKey(Company_info, on_delete=models.CASCADE)
     registered_at = models.DateTimeField(default=timezone.now)
+    
+    
 
     def save(self, *args, **kwargs):
         if self.password and not self.password.startswith("pbkdf2_"):
@@ -144,6 +146,11 @@ class PendingUser(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = "Pending User"
+        verbose_name_plural = "Pending Users"
+        ordering = ['-registered_at']
 
 # -------------------------
 # User Info Table (Activated Users)
