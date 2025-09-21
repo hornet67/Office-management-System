@@ -116,22 +116,25 @@ class User_role(models.Model):
 # Pending User Table
 # -------------------------
 class PendingUser(models.Model):
-    title = models.CharField(max_length=100)
-    name = models.CharField(max_length=100)
+    title = models.CharField(max_length=100,blank=True, null=True)
+    name = models.CharField(max_length=100,blank=True, null=True)
     email = models.EmailField(max_length=254)
     phone_number = models.CharField(max_length=11)
     gender_choices = [('male', 'Male'), ('female', 'Female'), ('other', 'Other')]
     gender = models.CharField(max_length=10, choices=gender_choices)
-    address = models.TextField(blank=True)
+    address = models.TextField(blank=True,null=True)
     role = models.ForeignKey(User_role, on_delete=models.CASCADE)
     dob = models.DateField(blank=True, null=True)
     religion_choices = [('Islam', 'Islam'), ('Hindu', 'Hindu'), ('Buddhism', 'Buddhism'),
                         ('Christianity', 'Christianity'), ('Other', 'Other')]
-    religion = models.CharField(max_length=15, choices=religion_choices)
-    nid = models.CharField(max_length=100)
-    passport = models.CharField(max_length=100)
-    driving_license = models.CharField(max_length=100)
-    corporate_id = models.CharField(max_length=100, blank=True)
+    religion = models.CharField(max_length=15, choices=religion_choices,blank=True, null=True)
+    
+    
+    nid = models.CharField(max_length=100,blank=True, null=True)
+    passport = models.CharField(max_length=100,blank=True, null=True)
+    driving_license = models.CharField(max_length=100,blank=True, null=True)
+    corporate_id = models.CharField(max_length=100, blank=True, null=True)
+
     password = models.CharField(max_length=128)
     image = models.ImageField(upload_to='user_images/', null=True, blank=True)
     company = models.ForeignKey(Company_info, on_delete=models.CASCADE)
