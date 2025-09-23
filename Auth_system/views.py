@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import check_password
 
 
 from .models import *
@@ -28,10 +29,34 @@ def Register(request):
     return render(request, "register.html", {"form": form, "roles": roles, "companies": companies})
 
 
-    
+
 
 def Login(request):
-    return render(request,'login.html')
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        # Check if user is pending first
+        if PendingUser.objects.filter(email=email).exists():
+            messages.warning(request, "Your account is not activated yet.")
+            return render(request, 'login.html')
+
+        user = User_info.objects.filter(email=email).first()
+        if not user:
+            messages.error(request, "Invalid email")
+            return render(request, 'login.html')
+       
+        # breakpoint()
+        # Check password for active user
+        if check_password(password, user.password):
+            # User authenticated, render dashboard
+            return render(request, 'base.html', {'user': user})
+        else:
+            messages.error(request, "Invalid password.")
+
+    return render(request, 'login.html')
 
 def Dashboard(request):
     return render(request,'base.html')
+
+
