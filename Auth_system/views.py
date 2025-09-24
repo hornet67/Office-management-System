@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 
 
@@ -19,7 +19,7 @@ def Register(request):
             user = form.save()
             user.save()
             messages.success(request, "User registered successfully and is pending approval.")
-            return redirect("dashboard/")
+            return redirect("login/")
         else:
             print(form.errors) 
             #messages.error(request, "Please correct the errors below.")
@@ -56,6 +56,14 @@ def Login(request):
 
     return render(request, 'login.html')
 
+
+
+def Logout(request):
+    request.session.flush()
+    messages.success(request, "Successfully logged out!") 
+    return redirect('login')
+
+@login_required(login_url='login')
 def Dashboard(request):
     return render(request,'base.html')
 
